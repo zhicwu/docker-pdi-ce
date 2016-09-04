@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+  pdi-slave:
+    build: .
+    image: zhicwu/pdi-ce${PDI_IMAGE_TAG}
+    hostname: ${SERVER_HOST}
+    container_name: ${PDI_CONTAINER_NAME}
+    command: slave
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    volumes:
+      - ./ext:/pdi-ext:ro
+      - ./data/logs:/data-integration/logs:rw
+      - ./data/osgi/cache:/data-integration/system/karaf/caches:rw
+      - ./data/osgi/data:/data-integration/system/karaf/data:rw
+      - ./data/tmp:/tmp:rw
+    environment:
+      # uncomment below if you want to see the generated admin password
+      #DEBUG: Y
+      PENTAHO_DI_JAVA_OPTIONS: '${PENTAHO_DI_JAVA_OPTIONS}'
+      PDI_HADOOP_CONFIG: ${PDI_HADOOP_CONFIG}
+      PDI_MAX_LOG_LINES: ${PDI_MAX_LOG_LINES}
+      PDI_MAX_LOG_TIMEOUT: ${PDI_MAX_LOG_TIMEOUT}
+      PDI_MAX_OBJ_TIMEOUT: ${PDI_MAX_OBJ_TIMEOUT}
+      CERT_COUNTRY: ${CERT_COUNTRY}
+      CERT_STATE: ${CERT_STATE}
+      CERT_LOCATION: ${CERT_LOCATION}
+      CERT_ORGANIZATION: ${CERT_ORGANIZATION}
+      CERT_ORG_UNIT: ${CERT_ORG_UNIT}
+      CERT_NAME: ${CERT_NAME}
+      SERVER_NAME: ${SERVER_NAME}
+      SERVER_HOST: ${SERVER_HOST}
+      SERVER_PORT: ${SERVER_PORT}
+      SERVER_USER: ${SERVER_USER}
+      SERVER_PASSWD: ${SERVER_PASSWD}
+      MASTER_NAME: ${MASTER_NAME}
+      MASTER_HOST: ${MASTER_HOST}
+      MASTER_PORT: ${MASTER_PORT}
+      MASTER_CONTEXT: ${MASTER_CONTEXT}
+      MASTER_USER: ${MASTER_USER}
+      MASTER_PASSWD: ${MASTER_PASSWD}
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    restart: always
