@@ -23,7 +23,14 @@ WORKDIR $KETTLE_HOME
 # Download and Apply Patches
 RUN wget --progress=dot:giga https://github.com/zhicwu/pdi-cluster/releases/download/${PDI_PATCH}/pentaho-kettle-${PDI_PATCH}.jar \
 	&& unzip -q pentaho-kettle*.jar -d classes \
-	&& rm -f pentaho-kettle*.jar
+	&& rm -f pentaho-kettle*.jar \
+	&& wget https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna/4.2.2/jna-4.2.2.jar \
+		https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna-platform/4.2.2/jna-platform-4.2.2.jar \
+		http://central.maven.org/maven2/com/github/dblock/oshi-core/3.2/oshi-core-3.2.jar \
+	&& mv *.jar lib/. \
+	&& apt-get update \
+	&& apt-get install -y libjna-java \
+	&& rm -rf /var/lib/apt/lists/*
 
 # Update JDBC Drivers
 RUN wget --progress=dot:giga http://central.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_DRIVER_VERSION}/mysql-connector-java-${MYSQL_DRIVER_VERSION}.jar \
@@ -31,6 +38,11 @@ RUN wget --progress=dot:giga http://central.maven.org/maven2/mysql/mysql-connect
 		http://central.maven.org/maven2/com/github/zhicwu/cassandra-jdbc-driver/${CASSANDRA_DRIVER_VERSION}/cassandra-jdbc-driver-${CASSANDRA_DRIVER_VERSION}-shaded.jar \
 	&& rm -f lib/mysql*.jar lib/jtds*.jar \
 	&& mv *.jar lib/.
+
+# Install Plugins
+# TODO:
+# 1) https://github.com/graphiq-data/pdi-streamschemamerge-plugin
+# 2) https://github.com/graphiq-data/pdi-fastjsoninput-plugin
 
 # Plant Entrypoint
 COPY docker-entrypoint.sh docker-entrypoint.sh
