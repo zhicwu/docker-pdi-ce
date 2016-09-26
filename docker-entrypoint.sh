@@ -300,7 +300,7 @@ if [ "$1" = 'slave' ]; then
 
 	# now start the PDI server
 	echo "Starting Carte as slave server..."
-	su - $PDI_UER -c "./carte.sh pwd/slave.xml"
+	su - $PDI_USER -c "./carte.sh pwd/slave.xml"
 elif [ "$1" = 'master' ]; then
 	apply_changes
 	gen_master_config
