@@ -29,6 +29,30 @@ set -e
 : ${MASTER_USER:="admin"}
 : ${MASTER_PASSWD:="password"}
 
+fix_permission() {
+	echo "Fixing permissions..."
+	
+	if [ "$HOST_USER_ID" != "" ]; then
+		# based on https://github.com/schmidigital/permission-fix/blob/master/tools/permission_fix
+		UNUSED_USER_ID=21338
+
+		# Setting User Permissions
+		DOCKER_USER_CURRENT_ID=`id -u $PDI_USER`
+
+		if [ "$DOCKER_USER_CURRENT_ID" != "$HOST_USER_ID" ]; then
+		  DOCKER_USER_OLD=`getent passwd $HOST_USER_ID | cut -d: -f1`
+
+		  if [ ! -z "$DOCKER_USER_OLD" ]; then
+			usermod -o -u $UNUSED_USER_ID $DOCKER_USER_OLD
+		  fi
+
+		  usermod -o -u $HOST_USER_ID $PDI_USER || true
+		fi
+	fi
+	
+	chown -R $PDI_USER:$PDI_USER $KETTLE_HOME /tmp
+}
+
 apply_changes() {
 	# you can mount a volume pointing to /pdi-ext for customization
 	if [ -d $EXT_DIR ]; then
@@ -267,6 +291,8 @@ if [ "$1" = 'slave' ]; then
 	gen_slave_config
 	gen_rest_conf
 
+	fix_permission
+	
 	# update configuration based on environment variables
 	# send log output to stdout
 	#sed -i 's/^\(.*rootLogger.*\), *out *,/\1, stdout,/' system/karaf/etc/org.ops4j.pax.logging.cfg
@@ -274,15 +300,17 @@ if [ "$1" = 'slave' ]; then
 
 	# now start the PDI server
 	echo "Starting Carte as slave server..."
-	./carte.sh pwd/slave.xml
+	su - $PDI_UER -c "./carte.sh pwd/slave.xml"
 elif [ "$1" = 'master' ]; then
 	apply_changes
 	gen_master_config
 	gen_rest_conf
 
+	fix_permission
+	
 	# now start the PDI server
 	echo "Starting Carte as master server(it's better use BA server instead)..."
-	./carte.sh pwd/master.xml
+	su - $PDI_USER -c "./carte.sh pwd/master.xml"
 fi
 
 exec "$@"
