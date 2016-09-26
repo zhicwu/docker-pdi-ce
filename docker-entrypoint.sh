@@ -209,12 +209,13 @@ gen_slave_config() {
 		_gen_keystore
 		_gen_password
 
-		rm -f .kettle/kettle.properties
-
 		if [[ ! $MASTER_PASSWD == Encrypted* ]]; then
 			MASTER_PASSWD=$(./encr.sh -kettle $MASTER_PASSWD | tail -1)
 		fi
 
+		# this is tricky as encr.sh will generate kettle.properties without required configuration
+		rm -f .kettle/kettle.properties
+		
 		cat <<< "<slave_config>
     <masters>
         <slaveserver>
