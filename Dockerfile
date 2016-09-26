@@ -21,8 +21,8 @@ RUN apt-get update \
 
 # Download Pentaho Data Integration Community Edition and Unpack
 RUN wget --progress=dot:giga http://downloads.sourceforge.net/project/pentaho/Data%20Integration/${PDI_VERSION}/pdi-ce-${PDI_BUILD}.zip \
-	unzip -q *.zip \
-	rm -f *.zip
+	&& unzip -q *.zip \
+	&& rm -f *.zip
 
 # Add Entry Point and Templates
 COPY docker-entrypoint.sh $KETTLE_HOME/docker-entrypoint.sh
