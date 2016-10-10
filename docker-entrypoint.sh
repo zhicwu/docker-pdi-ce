@@ -69,7 +69,8 @@ apply_changes() {
 
 	if [ ! -d system/karaf/data/log ]; then
 		mkdir -p logs system/karaf/data/log system/karaf/data/tmp \
-			&& sed -i 's/^\(active.hadoop.configuration=\).*/\1'"$PDI_HADOOP_CONFIG"'/' plugins/pentaho-big-data-plugin/plugin.properties
+			&& sed -i 's/^\(active.hadoop.configuration=\).*/\1'"$PDI_HADOOP_CONFIG"'/' plugins/pentaho-big-data-plugin/plugin.properties \
+			&& sed -i 's|\(PENTAHO_DI_JAVA_OPTIONS=\).*|\1"'"$PENTAHO_DI_JAVA_OPTIONS"'"|' spoon.sh
 	fi
 }
 
