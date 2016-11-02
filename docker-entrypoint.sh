@@ -54,6 +54,15 @@ fix_permission() {
 }
 
 apply_changes() {
+	# initialize PDI directories
+	if [ ! -f .initialized ]; then
+		echo "Initializing..."
+		find /tmp -maxdepth 1 -name "*.zip" -print0 | xargs -0 rm > /dev/null 2>&1
+		find /tmp -maxdepth 1 -name "*.log" -print0 | xargs -0 rm > /dev/null 2>&1
+		rm -rf .pentaho/* system/karaf/caches/* system/karaf/data/*
+		touch .initialized
+	fi
+	
 	# you can mount a volume pointing to /pdi-ext for customization
 	if [ -d $EXT_DIR ]; then
 		# if you have custom scripts to run, let's do it
