@@ -57,8 +57,8 @@ apply_changes() {
 	# initialize PDI directories
 	if [ ! -f .initialized ]; then
 		echo "Initializing..."
-		find /tmp -maxdepth 1 -name "*.zip" -print0 | xargs -0 rm > /dev/null 2>&1
-		find /tmp -maxdepth 1 -name "*.log" -print0 | xargs -0 rm > /dev/null 2>&1
+		find /tmp -maxdepth 1 -name "*.zip" -print0 | xargs -0 rm > /dev/null 2>&1 || echo "Done"
+		find /tmp -maxdepth 1 -name "*.log" -print0 | xargs -0 rm > /dev/null 2>&1 || echo "Done"
 		rm -rf .pentaho/* system/karaf/caches/* system/karaf/data/*
 		touch .initialized
 	fi
