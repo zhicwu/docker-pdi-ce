@@ -54,7 +54,12 @@ RUN wget --progress=dot:giga http://central.maven.org/maven2/mysql/mysql-connect
 # Configure PDI
 # plugins/kettle5-log4j-plugin/log4j.xml
 RUN rm -rf system/osgi/log4j.xml classes/log4j.xml pwd/* simple-jndi/* system/karaf/data/tmp \
+	&& cat <<< '#!/bin/bash
+> echo "OOM Killer activated! PID=$PID, PPID=$PPID"
+kill -9 $PPID
+> ' > oom_killer.sh \
 	&& chmod +x *.sh \
+	&& mv oom_killer.sh /usr/bin/oom_killer \
 	&& sed -i -e 's|\(.*if \[ \$OS = "linux" \]; then\)|if \[ \$OS = "n/a" \]; then|' spoon.sh \
 	&& sed -i 's/^\(respectStartLvlDuringFeatureStartup=\).*/\1true/' system/karaf/etc/org.apache.karaf.features.cfg \
 	&& sed -i 's/^\(featuresBootAsynchronous=\).*/\1false/' system/karaf/etc/org.apache.karaf.features.cfg
