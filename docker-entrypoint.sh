@@ -89,8 +89,8 @@ _gen_keystore() {
 	rm -f pwd/pdi.ks
 
 	# generate keystore as required
-	_KS_PWD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $((96 + RANDOM % 32)) | head -n 1)
-	_KEY_PWD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $((96 + RANDOM % 32)) | head -n 1)
+	_KS_PWD="$(dd if=/dev/urandom bs=255 count=1 | tr -dc 'a-zA-Z0-9' | fold -w $((96 + RANDOM % 32)) | head -n 1)"
+	_KEY_PWD="$(dd if=/dev/urandom bs=255 count=1 | tr -dc 'a-zA-Z0-9' | fold -w $((96 + RANDOM % 32)) | head -n 1)"
 
 	$JAVA_HOME/bin/keytool -keystore pwd/pdi.ks -alias pdi -noprompt \
 		-genkey -keyalg RSA -validity 36500 \
@@ -107,7 +107,7 @@ _gen_keystore() {
 _gen_password() {
 	echo "Generating encrypted password..."
 	if [[ "$SERVER_PASSWD" == "" ]]; then
-		_ADMIN_PWD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $((96 + RANDOM % 32)) | head -n 1)
+		_ADMIN_PWD="$(dd if=/dev/urandom bs=255 count=1 | tr -dc 'a-zA-Z0-9' | fold -w $((96 + RANDOM % 32)) | head -n 1)"
 	else
 		_ADMIN_PWD="$SERVER_PASSWD"
 	fi
