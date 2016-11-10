@@ -314,7 +314,7 @@ if [ "$1" = 'slave' ]; then
 
 	# now start the PDI server
 	echo "Starting Carte as slave server..."
-	exec /sbin/setuser $PDI_USER "./carte.sh pwd/slave.xml"
+	exec /sbin/setuser $PDI_USER $KETTLE_HOME/carte.sh $KETTLE_HOME/pwd/slave.xml
 elif [ "$1" = 'master' ]; then
 	apply_changes
 	gen_master_config
@@ -324,7 +324,7 @@ elif [ "$1" = 'master' ]; then
 	
 	# now start the PDI server
 	echo "Starting Carte as master server(it's better use BA server instead)..."
-	exec /sbin/setuser $PDI_USER "./carte.sh pwd/master.xml"
+	exec /sbin/setuser $PDI_USER $KETTLE_HOME/carte.sh $KETTLE_HOME/pwd/master.xml
 fi
 
 exec "$@"
