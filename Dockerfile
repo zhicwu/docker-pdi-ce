@@ -61,7 +61,7 @@ RUN rm -rf system/osgi/log4j.xml classes/log4j.xml pwd/* simple-jndi/* system/ka
 
 VOLUME ["$KETTLE_HOME/logs", "$KETTLE_HOME/system/karaf/caches", "$KETTLE_HOME/system/karaf/data", "/tmp"]
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["/sbin/my_init", "--", "./docker-entrypoint.sh"]
 
 #  8080 - Carte Web Service
 #  8802 - Karaf SSHD
