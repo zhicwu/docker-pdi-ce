@@ -13,10 +13,14 @@ ENV PDI_VERSION=6.1 PDI_BUILD=6.1.0.1-196 PDI_PATCH=6.1.0.1-SNAPSHOT PDI_USER=pe
 	MYSQL_DRIVER_VERSION=5.1.40 JTDS_VERSION=1.3.1 CASSANDRA_DRIVER_VERSION=0.6.1 \
 	JNA_VERSION=4.2.2 OSHI_VERSION=3.2 KETTLE_HOME=/data-integration
 
-# Install Required Packages and Add User
+# Add Cron Jobs
+COPY purge-old-files.sh /etc/cron.hourly/purge-old-files
+
+# Install Required Packages, Configure Crons and Add User
 RUN apt-get update \
 	&& apt-get install -y libjna-java \
 	&& rm -rf /var/lib/apt/lists/* \
+	&& chmod 0700 /etc/cron.hourly/* \
 	&& useradd -md $KETTLE_HOME -s /bin/bash $PDI_USER
 
 # Download Pentaho Data Integration Community Edition and Unpack
