@@ -41,6 +41,10 @@ services:
       MASTER_CONTEXT: ${MASTER_CONTEXT}
       MASTER_USER: ${MASTER_USER}
       MASTER_PASSWD: ${MASTER_PASSWD}
+    # still need below even using docker engine 1.12
+    # see more at https://github.com/docker/docker/issues/21051 and https://docs.docker.com/engine/security/seccomp/
+    security_opt:
+      - seccomp:unconfined
     ulimits:
       nproc: 65535
       nofile:
