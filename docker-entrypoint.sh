@@ -48,12 +48,12 @@ fix_permission() {
 			fi
 
 			usermod -o -u $HOST_USER_ID $PDI_USER || true
-		
-			# all sub-directories
-			find $KETTLE_HOME -type d -print0 | xargs -0 chown $PDI_USER
-			# and then files and directories under /tmp
-			chown -R $PDI_USER /tmp/*
 		fi
+		
+		# all sub-directories
+		find $KETTLE_HOME -type d -print0 | xargs -0 chown $PDI_USER
+		# and then files and directories under /tmp
+		chown -R $PDI_USER /tmp/*
 	fi
 }
 
