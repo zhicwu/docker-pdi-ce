@@ -10,8 +10,9 @@ MAINTAINER Zhichun Wu <zhicwu@gmail.com>
 
 # Set Environment Variables
 ENV PDI_VERSION=7.0 PDI_BUILD=7.0.0.0-25 PDI_PATCH=7.0.0.0.3 PDI_USER=pentaho \
+	KETTLE_HOME=/data-integration POSTGRESQL_DRIVER_VERSION=9.4.1212 \
 	MYSQL_DRIVER_VERSION=5.1.40 JTDS_VERSION=1.3.1 CASSANDRA_DRIVER_VERSION=0.6.1 \
-	JNA_VERSION=4.2.2 OSHI_VERSION=3.2 KETTLE_HOME=/data-integration
+	H2DB_VERSION=1.4.193 HSQLDB_VERSION=2.3.4 JNA_VERSION=4.2.2 OSHI_VERSION=3.2
 
 # Add Cron Jobs
 COPY purge-old-files.sh /etc/cron.hourly/purge-old-files
@@ -44,10 +45,13 @@ RUN wget --progress=dot:giga https://github.com/zhicwu/pdi-cluster/releases/down
 	&& mv *.jar lib/.
 
 # Update JDBC Drivers
-RUN wget --progress=dot:giga http://central.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_DRIVER_VERSION}/mysql-connector-java-${MYSQL_DRIVER_VERSION}.jar \
+RUN wget --progress=dot:giga https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_DRIVER_VERSION}.jar \
+		http://central.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_DRIVER_VERSION}/mysql-connector-java-${MYSQL_DRIVER_VERSION}.jar \
 		http://central.maven.org/maven2/net/sourceforge/jtds/jtds/${JTDS_VERSION}/jtds-${JTDS_VERSION}.jar \
 		http://central.maven.org/maven2/com/github/zhicwu/cassandra-jdbc-driver/${CASSANDRA_DRIVER_VERSION}/cassandra-jdbc-driver-${CASSANDRA_DRIVER_VERSION}-shaded.jar \
-	&& rm -f lib/mysql*.jar lib/jtds*.jar \
+		http://central.maven.org/maven2/com/h2database/h2/${H2DB_VERSION}/h2-${H2DB_VERSION}.jar \
+		http://central.maven.org/maven2/org/hsqldb/hsqldb/${HSQLDB_VERSION}/hsqldb-${HSQLDB_VERSION}.jar \
+	&& rm -f lib/postgre*.jar lib/mysql*.jar lib/jtds*.jar lib/h2*.jar lib/hsqldb*.jar \
 	&& mv *.jar lib/.
 
 # Install Plugins
@@ -63,9 +67,9 @@ RUN rm -rf system/osgi/log4j.xml classes/log4j.xml pwd/* simple-jndi/* system/ka
 	&& sed -i 's/^\(respectStartLvlDuringFeatureStartup=\).*/\1true/' system/karaf/etc/org.apache.karaf.features.cfg \
 	&& sed -i 's/^\(featuresBootAsynchronous=\).*/\1false/' system/karaf/etc/org.apache.karaf.features.cfg
 
-VOLUME ["$KETTLE_HOME/logs", "$KETTLE_HOME/system/karaf/caches", "$KETTLE_HOME/system/karaf/data", "/tmp"]
-
 ENTRYPOINT ["/sbin/my_init", "--", "./docker-entrypoint.sh"]
+
+#VOLUME ["$KETTLE_HOME/logs", "$KETTLE_HOME/system/karaf/caches", "$KETTLE_HOME/system/karaf/data", "/tmp"]
 
 #  8080 - Carte Web Service
 #  8802 - Karaf SSHD
