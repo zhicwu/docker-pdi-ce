@@ -3,7 +3,7 @@ set -e
 
 : ${EXT_DIR:="/pdi-ext"}
 
-: ${PDI_HADOOP_CONFIG:="hdp23"}
+: ${PDI_HADOOP_CONFIG:="hdp24"}
 
 : ${PDI_MAX_LOG_LINES:="10000"}
 : ${PDI_MAX_LOG_TIMEOUT:="1440"}
@@ -30,9 +30,10 @@ set -e
 : ${MASTER_PASSWD:="password"}
 
 fix_permission() {
-	echo "Fixing permissions..."
-	
-	if [ "$HOST_USER_ID" != "" ]; then
+	# only change when HOST_USER_ID is not empty(and not root)
+	if [ "$HOST_USER_ID" != "" ] && [ $HOST_USER_ID != 0 ]; then
+		echo "Fixing permissions..."
+		
 		# based on https://github.com/schmidigital/permission-fix/blob/master/tools/permission_fix
 		UNUSED_USER_ID=21338
 
@@ -40,17 +41,20 @@ fix_permission() {
 		DOCKER_USER_CURRENT_ID=`id -u $PDI_USER`
 
 		if [ "$DOCKER_USER_CURRENT_ID" != "$HOST_USER_ID" ]; then
-		  DOCKER_USER_OLD=`getent passwd $HOST_USER_ID | cut -d: -f1`
+			DOCKER_USER_OLD=`getent passwd $HOST_USER_ID | cut -d: -f1`
 
-		  if [ ! -z "$DOCKER_USER_OLD" ]; then
-			usermod -o -u $UNUSED_USER_ID $DOCKER_USER_OLD
-		  fi
+			if [ ! -z "$DOCKER_USER_OLD" ]; then
+				usermod -o -u $UNUSED_USER_ID $DOCKER_USER_OLD
+			fi
 
-		  usermod -o -u $HOST_USER_ID $PDI_USER || true
+			usermod -o -u $HOST_USER_ID $PDI_USER || true
+		
+			# all sub-directories
+			find $KETTLE_HOME -type d -print0 | xargs -0 chown $PDI_USER
+			# and then files and directories under /tmp
+			chown -R $PDI_USER /tmp/*
 		fi
 	fi
-	
-	chown -R $PDI_USER:$PDI_USER $KETTLE_HOME /tmp
 }
 
 apply_changes() {

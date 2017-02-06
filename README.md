@@ -3,13 +3,16 @@ Docker image for Pentaho Data Integration(PDI, aka Kettle) server community edit
 
 ## What's inside
 ```
-ubuntu:14.04
+ubuntu:16.04
  |
- |--- zhicwu/java:8
-       |
-       |--- zhicwu/pdi-ce:7.0
+ |-- phusion/baseimage:latest
+      |
+      |-- zhicwu/java:8
+           |
+           |-- zhicwu/pdi-ce:7.0
 ```
-* Official Ubuntu Trusty(14.04) docker image
+* Official Ubuntu 16.04 LTS docker image
+* Latest [Phusion Base Image](https://github.com/phusion/baseimage-docker)
 * Oracle JDK 8 latest release
 * [Pentaho Data Integration Community Edition](http://community.pentaho.com/) 7.0.0.0-25 with the followings:
  * Up-to-date JDBC drivers: [MySQL Connector/J](http://dev.mysql.com/downloads/connector/j/) 5.1.40, [jTDS](https://sourceforge.net/projects/jtds/) 1.3.1 and [Cassandra JDBC Driver](https://github.com/zhicwu/cassandra-jdbc-driver) 0.6.1
@@ -27,7 +30,7 @@ ubuntu:14.04
 ```
 # docker-compose up -d
 ```
-You should now be able to access the PDI server via http://localhost:8080/kettle/status.
+You should now be able to use admin/password to access the PDI server via [http://localhost:8080/kettle/status](http://localhost:8080/kettle/status).
 
 ## How to build
 ```
