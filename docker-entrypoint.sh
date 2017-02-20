@@ -64,6 +64,7 @@ apply_changes() {
 		find /tmp -maxdepth 1 -name "*.zip" -print0 | xargs -0 rm > /dev/null 2>&1 || echo "Done"
 		find /tmp -maxdepth 1 -name "*.log" -print0 | xargs -0 rm > /dev/null 2>&1 || echo "Done"
 		rm -rf .pentaho/* .kettle/* system/karaf/caches/* system/karaf/data/* && mkdir -p .kettle
+		find $KETTLE_HOME -type d -print0 | xargs -0 chown $PDI_USER
 		touch .initialized
 	fi
 	
