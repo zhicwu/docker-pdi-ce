@@ -3,7 +3,7 @@ set -e
 
 : ${EXT_DIR:="/pdi-ext"}
 
-: ${PDI_HADOOP_CONFIG:="hdp24"}
+: ${PDI_HADOOP_CONFIG:="hdp25"}
 
 : ${PDI_MAX_LOG_LINES:="10000"}
 : ${PDI_MAX_LOG_TIMEOUT:="1440"}
