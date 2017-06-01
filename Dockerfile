@@ -62,6 +62,7 @@ RUN wget --progress=dot:giga https://jdbc.postgresql.org/download/postgresql-${P
 # Configure PDI
 # plugins/kettle5-log4j-plugin/log4j.xml
 RUN rm -rf system/osgi/log4j.xml classes/log4j.xml pwd/* simple-jndi/* system/karaf/data/tmp \
+	&& ln -s $JMX_EXPORTER_FILE jmx-exporter.jar \
 	&& chmod +x *.sh \
 	&& sed -i -e 's|\(.*if \[ \$OS = "linux" \]; then\)|if \[ \$OS = "n/a" \]; then|' spoon.sh \
 	&& sed -i 's/^\(respectStartLvlDuringFeatureStartup=\).*/\1true/' system/karaf/etc/org.apache.karaf.features.cfg \
