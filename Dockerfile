@@ -10,18 +10,17 @@ MAINTAINER Zhichun Wu <zhicwu@gmail.com>
 
 # Set Environment Variables
 ENV PDI_VERSION=7.1 PDI_BUILD=7.1.0.0-12 PDI_PATCH=7.1.0.0 PDI_USER=pentaho \
-	KETTLE_HOME=/data-integration POSTGRESQL_DRIVER_VERSION=42.1.1 \
+	KETTLE_HOME=/data-integration POSTGRESQL_DRIVER_VERSION=9.4.1212 \
 	MYSQL_DRIVER_VERSION=5.1.42 JTDS_VERSION=1.3.1 CASSANDRA_DRIVER_VERSION=0.6.3 \
-	H2DB_VERSION=1.4.195 HSQLDB_VERSION=2.4.0 JNA_VERSION=4.2.2 OSHI_VERSION=3.4.0
+	H2DB_VERSION=1.4.195 HSQLDB_VERSION=2.4.0
 
 # Add Cron Jobs
 COPY purge-old-files.sh /usr/local/bin/purge-old-files.sh
 
 # Install Required Packages, Configure Crons and Add User
 RUN apt-get update \
-	&& apt-get install -y libjna-java \
+	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
-	&& chmod 0700 /etc/cron.hourly/* \
 	&& useradd -md $KETTLE_HOME -s /bin/bash $PDI_USER
 
 # Download Pentaho Data Integration Community Edition and Unpack
@@ -38,11 +37,7 @@ WORKDIR $KETTLE_HOME
 # Download and Apply Patches
 RUN wget --progress=dot:giga https://github.com/zhicwu/pdi-cluster/releases/download/${PDI_PATCH}/pentaho-kettle-${PDI_PATCH}.jar \
 	&& unzip -q pentaho-kettle*.jar -d classes \
-	&& rm -f pentaho-kettle*.jar \
-	&& wget https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna/$JNA_VERSION/jna-$JNA_VERSION.jar \
-		https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna-platform/$JNA_VERSION/jna-platform-$JNA_VERSION.jar \
-		http://central.maven.org/maven2/com/github/dblock/oshi-core/$OSHI_VERSION/oshi-core-$OSHI_VERSION.jar \
-	&& mv *.jar lib/.
+	&& rm -f pentaho-kettle*.jar
 
 # Update JDBC Drivers
 RUN wget --progress=dot:giga https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_DRIVER_VERSION}.jar \
