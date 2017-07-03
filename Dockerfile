@@ -12,16 +12,15 @@ MAINTAINER Zhichun Wu <zhicwu@gmail.com>
 ENV PDI_VERSION=7.1 PDI_BUILD=7.1.0.0-12 PDI_PATCH=7.1.0.0 PDI_USER=pentaho \
 	KETTLE_HOME=/data-integration POSTGRESQL_DRIVER_VERSION=42.1.1 \
 	MYSQL_DRIVER_VERSION=5.1.42 JTDS_VERSION=1.3.1 CASSANDRA_DRIVER_VERSION=0.6.3 \
-	H2DB_VERSION=1.4.195 HSQLDB_VERSION=2.4.0 JNA_VERSION=4.2.2 OSHI_VERSION=3.4.0
+	H2DB_VERSION=1.4.196 HSQLDB_VERSION=2.4.0
 
 # Add Cron Jobs
-COPY purge-old-files.sh /etc/cron.hourly/purge-old-files
+COPY purge-old-files.sh /usr/local/bin/purge-old-files.sh
 
 # Install Required Packages, Configure Crons and Add User
 RUN apt-get update \
-	&& apt-get install -y libjna-java \
+	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
-	&& chmod 0700 /etc/cron.hourly/* \
 	&& useradd -md $KETTLE_HOME -s /bin/bash $PDI_USER
 
 # Download Pentaho Data Integration Community Edition and Unpack
@@ -38,11 +37,7 @@ WORKDIR $KETTLE_HOME
 # Download and Apply Patches
 RUN wget --progress=dot:giga https://github.com/zhicwu/pdi-cluster/releases/download/${PDI_PATCH}/pentaho-kettle-${PDI_PATCH}.jar \
 	&& unzip -q pentaho-kettle*.jar -d classes \
-	&& rm -f pentaho-kettle*.jar \
-	&& wget https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna/$JNA_VERSION/jna-$JNA_VERSION.jar \
-		https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna-platform/$JNA_VERSION/jna-platform-$JNA_VERSION.jar \
-		http://central.maven.org/maven2/com/github/dblock/oshi-core/$OSHI_VERSION/oshi-core-$OSHI_VERSION.jar \
-	&& mv *.jar lib/.
+	&& rm -f pentaho-kettle*.jar
 
 # Update JDBC Drivers
 RUN wget --progress=dot:giga https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_DRIVER_VERSION}.jar \
@@ -62,7 +57,10 @@ RUN wget --progress=dot:giga https://jdbc.postgresql.org/download/postgresql-${P
 # Configure PDI
 # plugins/kettle5-log4j-plugin/log4j.xml
 RUN rm -rf system/osgi/log4j.xml classes/log4j.xml pwd/* simple-jndi/* system/karaf/data/tmp \
-	&& chmod +x *.sh \
+	&& ln -s $JMX_EXPORTER_FILE jmx-exporter.jar \
+	&& echo "01 * * * * /usr/local/bin/purge-old-files.sh 2>>/var/log/cron.log" > /var/spool/cron/crontabs/root \
+	&& chmod 0600 /var/spool/cron/crontabs/root \
+	&& chmod +x *.sh /usr/local/bin/*.sh \
 	&& sed -i -e 's|\(.*if \[ \$OS = "linux" \]; then\)|if \[ \$OS = "n/a" \]; then|' spoon.sh \
 	&& sed -i 's/^\(respectStartLvlDuringFeatureStartup=\).*/\1true/' system/karaf/etc/org.apache.karaf.features.cfg \
 	&& sed -i 's/^\(featuresBootAsynchronous=\).*/\1false/' system/karaf/etc/org.apache.karaf.features.cfg

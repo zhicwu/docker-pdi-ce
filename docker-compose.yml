@@ -9,6 +9,7 @@ services:
     command: slave
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
+      - "12345:12345"
     volumes:
       - ./ext:/pdi-ext:ro
       - ./data/logs:/data-integration/logs:rw
