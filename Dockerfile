@@ -12,7 +12,7 @@ MAINTAINER Zhichun Wu <zhicwu@gmail.com>
 ENV PDI_VERSION=7.1 PDI_BUILD=7.1.0.0-12 PDI_PATCH=7.1.0.0 PDI_USER=pentaho \
 	KETTLE_HOME=/data-integration POSTGRESQL_DRIVER_VERSION=42.1.1 \
 	MYSQL_DRIVER_VERSION=5.1.42 JTDS_VERSION=1.3.1 CASSANDRA_DRIVER_VERSION=0.6.3 \
-	H2DB_VERSION=1.4.196 HSQLDB_VERSION=2.4.0
+	H2DB_VERSION=1.4.196 HSQLDB_VERSION=2.4.0 JMX_EXPORTER_VERSION=0.9
 
 # Add Cron Jobs
 COPY purge-old-files.sh /usr/local/bin/purge-old-files.sh
@@ -57,7 +57,7 @@ RUN wget --progress=dot:giga https://jdbc.postgresql.org/download/postgresql-${P
 # Configure PDI
 # plugins/kettle5-log4j-plugin/log4j.xml
 RUN rm -rf system/osgi/log4j.xml classes/log4j.xml pwd/* simple-jndi/* system/karaf/data/tmp \
-	&& ln -s $JMX_EXPORTER_FILE jmx-exporter.jar \
+	&& wget -O jmx-exporter.jar http://central.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/${JMX_EXPORTER_VERSION}/jmx_prometheus_javaagent-${JMX_EXPORTER_VERSION}.jar \
 	&& echo "01 * * * * /usr/local/bin/purge-old-files.sh 2>>/var/log/cron.log" > /var/spool/cron/crontabs/root \
 	&& chmod 0600 /var/spool/cron/crontabs/root \
 	&& chmod +x *.sh /usr/local/bin/*.sh \
