@@ -20,8 +20,8 @@ RUN apt-get update \
 RUN wget --progress=dot:giga http://downloads.sourceforge.net/project/pentaho/Data%20Integration/${PDI_VERSION}/pdi-ce-${PDI_BUILD}.zip \
 	&& unzip -q *.zip \
 	&& rm -f *.zip \
-	&& chmod +x *.sh \
-	&& sed -i -e 's|\(.*if \[ \$OS = "linux" \]; then\)|if \[ \$OS = "n/a" \]; then|' spoon.sh
+	&& chmod +x $KETTLE_HOME/*.sh \
+	&& sed -i -e 's|\(.*if \[ \$OS = "linux" \]; then\)|if \[ \$OS = "n/a" \]; then|' $KETTLE_HOME/spoon.sh
 
 # Switch directory
 WORKDIR $KETTLE_HOME
