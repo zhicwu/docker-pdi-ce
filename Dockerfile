@@ -9,8 +9,8 @@ FROM zhicwu/pdi-ce:7.1-full
 MAINTAINER Zhichun Wu <zhicwu@gmail.com>
 
 # Set environment variables
-ENV PDI_PATCH=7.1.0.0 PDI_USER=pentaho \
-	JMX_EXPORTER_VERSION=0.9
+ENV PDI_PATCH=7.1.0.5 PDI_USER=pentaho \
+	JMX_EXPORTER_VERSION=0.10
 
 # Add cron job and entrypoint
 COPY purge-old-files.sh /usr/local/bin/purge-old-files.sh
