@@ -7,7 +7,7 @@
 #
 FROM zhicwu/java:8 as builder
 
-ENV PDI_RELEASE=7.1.0.5 PDI_BUILD=69 ANT_VERSION=1.10.1
+ENV PDI_RELEASE=7.1.0.5 PDI_BUILD=70 ANT_VERSION=1.10.1
 ENV PDI_VERSION=${PDI_RELEASE}-${PDI_BUILD}
 
 RUN apt-get update \
@@ -20,14 +20,14 @@ RUN apt-get update \
 	&& for f in $(find . -name "build*.xml" -o -name "subfloor*.xml" -type f); do cat $f.new | sed -e 's|<junit|<!-- junit|' -e 's|</\(junit\w*\)>|\1 -->|' > $f; done \
 	&& for f in $(find . -name "build*.xml" -o -name "subfloor*.xml" -type f); do cat $f | sed -e 's/<!--/\x0<!--/g;s/-->/-->\x0/g' | grep -zv '^<!--' | tr -d '\0' > $f.new; done \
 	&& for f in $(find . -name "build*.xml" -o -name "subfloor*.xml" -type f); do cat $f.new | sed -e 's|<jacoco:coverage|<!-- jacoco:coverage|' -e 's|</\(jacoco:coverage\)>|\1 -->|' > $f; done \
-	&& wget --tries=50 --progress=dot:giga http://ivy-nexus.pentaho.org/content/groups/omni/pentaho/pentaho-karaf-assembly/${PDI_VERSION}/pentaho-karaf-assembly-${PDI_VERSION}-client.zip \
+	&& wget --timeout=5 --waitretry=2 --tries=50 --retry-connrefused --progress=dot:giga http://ivy-nexus.pentaho.org/content/groups/omni/pentaho/pentaho-karaf-assembly/${PDI_VERSION}/pentaho-karaf-assembly-${PDI_VERSION}-client.zip \
 		http://ivy-nexus.pentaho.org/content/groups/omni/pentaho/pentaho-big-data-plugin/${PDI_VERSION}/pentaho-big-data-plugin-${PDI_VERSION}.zip \
 	&& mvn install:install-file -Dfile=pentaho-big-data-plugin-${PDI_VERSION}.zip -DgroupId=pentaho -DartifactId=pentaho-big-data-plugin -Dversion=${PDI_VERSION} -Dpackaging=zip \
 	&& mvn install:install-file -Dfile=pentaho-karaf-assembly-${PDI_VERSION}-client.zip -DgroupId=pentaho -DartifactId=pentaho-karaf-assembly -Dversion=${PDI_VERSION} -Dpackaging=zip \
 	&& sed -i -e 's|\(/packaging>\)|\1\n  <classifier>client</classifier>|' /root/.m2/repository/pentaho/pentaho-karaf-assembly/${PDI_VERSION}/pentaho-karaf-assembly-${PDI_VERSION}.pom \
 	&& find . -name "ivysettings.xml" | xargs sed -i -e 's|\(<settings \)|<property name="local-maven2-dir" value="${user.home}/.m2/repository/" />\n\n  \1|' \
 	&& find . -name "ivysettings.xml" | xargs sed -i -e 's|\(<dual \)|<filesystem name="local-maven-2" m2compatible="true" force="false" local="true">\n        <artifact pattern="${local-maven2-dir}/[organisation]/[module]/[revision]/[module]-[revision].[ext]"/>\n        <ivy pattern="${local-maven2-dir}/[organisation]/[module]/[revision]/[module]-[revision].pom"/>\n      </filesystem>\n\n      \1|' \
-	&& for i in 1 2 3 4 5 6 7 8 9 0; do /apache-ant-$ANT_VERSION/bin/ant -Divy.checksums= dist && break || echo "x Retrying... #$i" && sleep 3; done \
+	&& for i in 1 2 3 4 5; do /apache-ant-$ANT_VERSION/bin/ant -Divy.checksums= dist && break || echo "x Retrying... #$i" && sleep 3; done \
 	&& rm -rf dist/*.bat dist/*.command dist/Data\ Integration.app dist/samples \
 	&& chmod +x dist/*.sh \
 	&& sed -i -e 's|\(.*if \[ \$OS = "linux" \]; then\)|if \[ \$OS = "n/a" \]; then|' dist/spoon.sh \
@@ -43,7 +43,7 @@ FROM zhicwu/java:8
 MAINTAINER Zhichun Wu <zhicwu@gmail.com>
 
 # Set environment variables
-ENV PDI_VERSION=7.1.0.5-69 KETTLE_HOME=/data-integration
+ENV PDI_VERSION=7.1.0.5-70 KETTLE_HOME=/data-integration
 
 # Set label
 LABEL java_server="Pentaho Data Integration $PDI_VERSION Community Edition"
