@@ -29,14 +29,15 @@ RUN apt-get update \
 	&& mvn install:install-file -Dfile=pentaho-karaf-assembly-${PDI_VERSION}-client.zip -DgroupId=pentaho -DartifactId=pentaho-karaf-assembly -Dversion=${PDI_VERSION} -Dpackaging=zip \
 	&& mvn install:install-file -Dfile=org.eclipse.swt.gtk.linux.x86_64-$ECLIPSE_SWT_VERSION.jar -DgroupId=org.eclipse.swt -DartifactId=org.eclipse.swt.gtk.linux.x86_64 -Dversion=$ECLIPSE_SWT_VERSION -Dpackaging=jar \
 	&& mvn install:install-file -Dfile=syslog4j-$SYSLOG4J_VERSION.jar -DgroupId=org.syslog4j -DartifactId=syslog4j -Dversion=$SYSLOG4J_VERSION -Dpackaging=jar \
-	&& sed -i -e 's|\(/packaging>\)|\1\n  <classifier>client</classifier>|' /root/.m2/repository/pentaho/pentaho-karaf-assembly/${PDI_VERSION}/pentaho-karaf-assembly-${PDI_VERSION}.pom \
+	&& find . -name "*.xml" -type f | xargs sed -i -e 's| m:classifier="client"||' \
 	&& find . -name "ivysettings.xml" | xargs sed -i -e 's|\(<settings \)|<property name="local-maven2-dir" value="${user.home}/.m2/repository/" />\n\n  \1|' \
 	&& find . -name "ivysettings.xml" | xargs sed -i -e 's|\(<dual \)|<filesystem name="local-maven-2" m2compatible="true" force="false" local="true">\n        <artifact pattern="${local-maven2-dir}/[organisation]/[module]/[revision]/[module]-[revision].[ext]"/>\n        <ivy pattern="${local-maven2-dir}/[organisation]/[module]/[revision]/[module]-[revision].pom"/>\n      </filesystem>\n\n      \1|' \
-	&& for i in 1 2 3 4 5; do /apache-ant-$ANT_VERSION/bin/ant -Divy.checksums= dist && break || echo "x Retrying... #$i" && sleep 3; done \
+	&& for i in 1 2 3 4 5; do /apache-ant-$ANT_VERSION/bin/ant -Divy.checkmodified=false -Divy.checksums= dist && break || echo "x Retrying... #$i" && sleep 3; done \
 	&& rm -rf dist/*.bat dist/*.command dist/Data\ Integration.app dist/samples \
 	&& chmod +x dist/*.sh \
 	&& sed -i -e 's|\(.*if \[ \$OS = "linux" \]; then\)|if \[ \$OS = "n/a" \]; then|' dist/spoon.sh \
-	&& mv dist /.
+	&& mv dist /. \
+	&& rm -rf /pentaho-kettle-*
 
 
 #
