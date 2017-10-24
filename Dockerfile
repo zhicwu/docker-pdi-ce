@@ -56,6 +56,7 @@ LABEL java_server="Pentaho Data Integration $PDI_VERSION Community Edition"
 
 # Update system
 RUN apt-get update \
+	&& apt-get install -y xvfb \
 	&& mkdir -p $KETTLE_HOME \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
