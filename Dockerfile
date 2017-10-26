@@ -3,7 +3,7 @@
 #
 
 # Pull base image
-FROM zhicwu/pdi-ce:7.1-base
+FROM zhicwu/pdi-ce:8.0-base
 
 # Set maintainer details
 MAINTAINER Zhichun Wu <zhicwu@gmail.com>
