@@ -19,8 +19,10 @@ COPY docker-entrypoint.sh docker-entrypoint.sh
 # Add user, apply patches and configure PDI
 RUN useradd -md $KETTLE_HOME -s /bin/bash $PDI_USER \
 	&& wget --progress=dot:giga https://github.com/zhicwu/pdi-cluster/releases/download/${PDI_PATCH}/pentaho-kettle-${PDI_PATCH}.jar \
-	&& unzip -q pentaho-kettle*.jar -d classes \
-	&& rm -f pentaho-kettle*.jar \
+		https://github.com/zhicwu/pdi-cluster/releases/download/${PDI_PATCH}/mondrian-${PDI_PATCH}.jar \
+	&& unzip -q mondrian*.jar -d classes \
+	&& unzip -oq pentaho-kettle*.jar -d classes \
+	&& rm -f mondrian*.jar pentaho-kettle*.jar \
 	&& rm -rf system/osgi/log4j.xml classes/log4j.xml pwd/* simple-jndi/* system/karaf/data/tmp \
 	&& wget -O jmx-exporter.jar http://central.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/${JMX_EXPORTER_VERSION}/jmx_prometheus_javaagent-${JMX_EXPORTER_VERSION}.jar \
 	&& echo "01 * * * * /usr/local/bin/purge-old-files.sh 2>>/var/log/cron.log" > /var/spool/cron/crontabs/root \
